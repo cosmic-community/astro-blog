@@ -17,7 +17,8 @@ export async function getAllPosts() {
       .props(['id', 'title', 'slug', 'metadata', 'created_at'])
       .depth(1);
 
-    return response.objects.sort((a, b) => {
+    // Changed: Added type annotation for sort parameters
+    return response.objects.sort((a: any, b: any) => {
       const dateA = new Date(a.created_at || '').getTime();
       const dateB = new Date(b.created_at || '').getTime();
       return dateB - dateA;
@@ -92,7 +93,8 @@ export async function getPostsByCategory(categoryId: string) {
       .props(['id', 'title', 'slug', 'metadata', 'created_at'])
       .depth(1);
 
-    return response.objects.sort((a, b) => {
+    // Changed: Added type annotation for sort parameters
+    return response.objects.sort((a: any, b: any) => {
       const dateA = new Date(a.created_at || '').getTime();
       const dateB = new Date(b.created_at || '').getTime();
       return dateB - dateA;
@@ -148,7 +150,8 @@ export async function getPostsByAuthor(authorId: string) {
       .props(['id', 'title', 'slug', 'metadata', 'created_at'])
       .depth(1);
 
-    return response.objects.sort((a, b) => {
+    // Changed: Added type annotation for sort parameters
+    return response.objects.sort((a: any, b: any) => {
       const dateA = new Date(a.created_at || '').getTime();
       const dateB = new Date(b.created_at || '').getTime();
       return dateB - dateA;

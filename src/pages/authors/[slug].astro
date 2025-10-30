@@ -9,7 +9,8 @@ import type { Author, Post } from '../../../types';
 
 export async function getStaticPaths() {
   const authors = await getAllAuthors();
-  return authors.map((author) => ({
+  // Changed: Added type annotation for author parameter
+  return authors.map((author: any) => ({
     params: { slug: author.slug },
   }));
 }

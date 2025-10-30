@@ -9,7 +9,8 @@ import type { Post } from '../../../types';
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
-  return posts.map((post) => ({
+  // Changed: Added type annotation for post parameter
+  return posts.map((post: any) => ({
     params: { slug: post.slug },
   }));
 }

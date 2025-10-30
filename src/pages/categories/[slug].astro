@@ -9,7 +9,8 @@ import type { Category, Post } from '../../../types';
 
 export async function getStaticPaths() {
   const categories = await getAllCategories();
-  return categories.map((category) => ({
+  // Changed: Added type annotation for category parameter
+  return categories.map((category: any) => ({
     params: { slug: category.slug },
   }));
 }

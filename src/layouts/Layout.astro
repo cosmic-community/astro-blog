@@ -1,12 +1,7 @@
 ---
-export interface Props {
-  title: any; // TODO: Define proper type
-  description: any; // TODO: Define proper type
-  image: any; // TODO: Define proper type
-}
-
 // src/layouts/Layout.astro
-interface Props {
+// Changed: Removed duplicate interface declaration, keeping only one export interface
+export interface Props {
   title: string;
   description?: string;
   image?: string;
