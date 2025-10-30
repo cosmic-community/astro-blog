@@ -1,0 +1,75 @@
+---
+// src/components/PostCard.astro
+import type { Post } from '../../types';
+
+export interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+
+const featuredImage = post.metadata?.featured_image;
+const author = post.metadata?.author;
+const category = post.metadata?.category;
+
+// Format date
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+---
+
+<article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+  {featuredImage && (
+    <a href={`/posts/${post.slug}`} class="block">
+      <img
+        src={`${featuredImage.imgix_url}?w=800&h=400&fit=crop&auto=format,compress`}
+        alt={post.title}
+        class="w-full h-48 object-cover"
+        width="400"
+        height="200"
+      />
+    </a>
+  )}
+  <div class="p-6">
+    {category && (
+      <a
+        href={`/categories/${category.slug}`}
+        class="inline-block text-sm font-medium text-primary hover:text-primary-dark mb-2"
+      >
+        {category.title}
+      </a>
+    )}
+    <h2 class="text-2xl font-bold text-gray-900 mb-3">
+      <a href={`/posts/${post.slug}`} class="hover:text-primary transition-colors">
+        {post.title}
+      </a>
+    </h2>
+    <div class="flex items-center text-sm text-gray-600 mb-4">
+      {author && (
+        <div class="flex items-center">
+          {author.metadata?.profile_photo && (
+            <img
+              src={`${author.metadata.profile_photo.imgix_url}?w=64&h=64&fit=crop&auto=format,compress`}
+              alt={author.title}
+              class="w-8 h-8 rounded-full mr-2"
+              width="32"
+              height="32"
+            />
+          )}
+          <a href={`/authors/${author.slug}`} class="hover:text-primary">
+            {author.title}
+          </a>
+        </div>
+      )}
+      <span class="mx-2">•</span>
+      <time datetime={post.created_at}>
+        {formatDate(post.created_at)}
+      </time>
+    </div>
+  </div>
+</article>

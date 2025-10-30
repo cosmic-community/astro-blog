@@ -1,0 +1,128 @@
+---
+// src/pages/posts/[slug].astro
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getAllPosts, getPostBySlug } from '../../../lib/cosmic';
+import { renderMarkdown } from '../../../lib/markdown';
+import type { Post } from '../../../types';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug) as Post | null;
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const author = post.metadata?.author;
+const category = post.metadata?.category;
+const featuredImage = post.metadata?.featured_image;
+const content = post.metadata?.content;
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const htmlContent = content ? renderMarkdown(content) : '';
+---
+
+<Layout 
+  title={post.title}
+  description={content?.substring(0, 160) || `Read ${post.title} on Modern Blog`}
+  image={featuredImage?.imgix_url ? `${featuredImage.imgix_url}?w=1200&h=630&fit=crop&auto=format,compress` : undefined}
+>
+  <Header />
+  
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <article>
+      {category && (
+        <a
+          href={`/categories/${category.slug}`}
+          class="inline-block text-sm font-medium text-primary hover:text-primary-dark mb-4"
+        >
+          {category.title}
+        </a>
+      )}
+      
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        {post.title}
+      </h1>
+      
+      <div class="flex items-center text-gray-600 mb-8">
+        {author && (
+          <div class="flex items-center">
+            {author.metadata?.profile_photo && (
+              <img
+                src={`${author.metadata.profile_photo.imgix_url}?w=96&h=96&fit=crop&auto=format,compress`}
+                alt={author.title}
+                class="w-12 h-12 rounded-full mr-3"
+                width="48"
+                height="48"
+              />
+            )}
+            <div>
+              <a href={`/authors/${author.slug}`} class="font-medium text-gray-900 hover:text-primary">
+                {author.title}
+              </a>
+              <p class="text-sm">
+                {formatDate(post.created_at)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {featuredImage && (
+        <img
+          src={`${featuredImage.imgix_url}?w=1600&h=800&fit=crop&auto=format,compress`}
+          alt={post.title}
+          class="w-full rounded-lg mb-8"
+          width="800"
+          height="400"
+        />
+      )}
+      
+      <div 
+        class="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700"
+        set:html={htmlContent}
+      />
+    </article>
+    
+    {author && author.metadata?.bio && (
+      <div class="mt-12 p-6 bg-gray-50 rounded-lg">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">About the Author</h3>
+        <div class="flex items-start space-x-4">
+          {author.metadata.profile_photo && (
+            <img
+              src={`${author.metadata.profile_photo.imgix_url}?w=160&h=160&fit=crop&auto=format,compress`}
+              alt={author.title}
+              class="w-20 h-20 rounded-full"
+              width="80"
+              height="80"
+            />
+          )}
+          <div>
+            <a href={`/authors/${author.slug}`} class="text-lg font-semibold text-gray-900 hover:text-primary">
+              {author.title}
+            </a>
+            <p class="text-gray-600 mt-2">{author.metadata.bio}</p>
+          </div>
+        </div>
+      </div>
+    )}
+  </main>
+  
+  <Footer />
+</Layout>

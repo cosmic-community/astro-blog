@@ -1,0 +1,43 @@
+---
+// src/pages/categories/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import CategoryCard from '../../components/CategoryCard.astro';
+import { getAllCategories, getAllPosts } from '../../../lib/cosmic';
+import type { Category, Post } from '../../../types';
+
+const categories = await getAllCategories() as Category[];
+const posts = await getAllPosts() as Post[];
+
+// Count posts per category
+const categoryPostCounts = categories.map(category => {
+  const count = posts.filter(post => post.metadata?.category?.id === category.id).length;
+  return { category, count };
+});
+---
+
+<Layout 
+  title="Categories - Modern Blog"
+  description="Browse blog posts by category. Explore Technology, Travel, and Lifestyle content."
+>
+  <Header />
+  
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-8">Categories</h1>
+    
+    {categoryPostCounts && categoryPostCounts.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categoryPostCounts.map(({ category, count }) => (
+          <CategoryCard category={category} postCount={count} />
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-12">
+        <p class="text-gray-600 text-lg">No categories found.</p>
+      </div>
+    )}
+  </main>
+  
+  <Footer />
+</Layout>

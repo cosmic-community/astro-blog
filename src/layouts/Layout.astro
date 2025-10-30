@@ -1,0 +1,137 @@
+---
+export interface Props {
+  title: any; // TODO: Define proper type
+  description: any; // TODO: Define proper type
+  image: any; // TODO: Define proper type
+}
+
+// src/layouts/Layout.astro
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description, image } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const defaultDescription = "A modern blog platform built with Astro and Cosmic CMS";
+const defaultImage = "https://imgix.cosmicjs.com/da99a750-b541-11f0-84b8-c1eed342c5b6-photo-1506126613408-eca07ce68773-1761795486014.jpg?w=1200&h=630&fit=crop&auto=format,compress";
+
+const bucketSlug = import.meta.env.COSMIC_BUCKET_SLUG;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description || defaultDescription} />
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description || defaultDescription} />
+    <meta property="og:image" content={image || defaultImage} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description || defaultDescription} />
+    <meta property="twitter:image" content={image || defaultImage} />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Console capture script for dashboard debugging -->
+    <script src="/dashboard-console-capture.js" is:inline></script>
+  </head>
+  <body class="font-sans antialiased bg-white text-gray-900">
+    <slot />
+    <script define:vars={{ bucketSlug }} is:inline>
+      // Cosmic badge with client-side bucket slug
+      (function() {
+        const isDismissed = localStorage.getItem('cosmic-badge-dismissed');
+        if (isDismissed) return;
+        
+        const badge = document.createElement('a');
+        badge.href = `https://www.cosmicjs.com?utm_source=bucket_${bucketSlug}&utm_medium=referral&utm_campaign=app_badge&utm_content=built_with_cosmic`;
+        badge.target = '_blank';
+        badge.rel = 'noopener noreferrer';
+        badge.innerHTML = `
+          <button id="cosmic-dismiss" style="
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 50%;
+            color: #374151;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            z-index: 10;
+          ">×</button>
+          <img src="https://cdn.cosmicjs.com/b67de7d0-c810-11ed-b01d-23d7b265c299-logo508x500.svg" 
+               alt="Cosmic Logo" 
+               style="width: 20px; height: 20px;">
+          Built with Cosmic
+        `;
+        
+        Object.assign(badge.style, {
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: '#11171A',
+          textDecoration: 'none',
+          fontSize: '14px',
+          fontWeight: '500',
+          backgroundColor: 'white',
+          border: '1px solid #e5e7eb',
+          padding: '12px 16px',
+          width: '180px',
+          borderRadius: '8px',
+          zIndex: '50',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          transition: 'background-color 0.2s ease',
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        });
+        
+        document.body.appendChild(badge);
+        
+        document.getElementById('cosmic-dismiss').onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          badge.remove();
+          localStorage.setItem('cosmic-badge-dismissed', 'true');
+        };
+        
+        const dismissBtn = document.getElementById('cosmic-dismiss');
+        dismissBtn.onmouseenter = () => dismissBtn.style.backgroundColor = '#e5e7eb';
+        dismissBtn.onmouseleave = () => dismissBtn.style.backgroundColor = '#f3f4f6';
+        
+        badge.onmouseenter = () => badge.style.backgroundColor = '#f9fafb';
+        badge.onmouseleave = () => badge.style.backgroundColor = 'white';
+      })();
+    </script>
+  </body>
+</html>
