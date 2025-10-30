@@ -1,6 +1,6 @@
 ---
 // src/layouts/Layout.astro
-// Changed: Removed duplicate interface declaration, keeping only one export interface
+// Changed: Added fallback for canonical URL when Astro.site is undefined
 export interface Props {
   title: string;
   description?: string;
@@ -8,7 +8,10 @@ export interface Props {
 }
 
 const { title, description, image } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// Changed: Handle case where Astro.site might be undefined with fallback
+const canonicalURL = Astro.site 
+  ? new URL(Astro.url.pathname, Astro.site)
+  : new URL(Astro.url.pathname, `https://${Astro.request.headers.get('host') || 'example.com'}`);
 const defaultDescription = "A modern blog platform built with Astro and Cosmic CMS";
 const defaultImage = "https://imgix.cosmicjs.com/da99a750-b541-11f0-84b8-c1eed342c5b6-photo-1506126613408-eca07ce68773-1761795486014.jpg?w=1200&h=630&fit=crop&auto=format,compress";
 
